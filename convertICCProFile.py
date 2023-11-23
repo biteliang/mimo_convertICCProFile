@@ -3,13 +3,14 @@ import time
 import subprocess
 import shutil
 
-cache_folder = "E:/convertICCProFile_cache"
-input_folder = "E:/convertICCProFile_input"
-output_folder = "E:/convertICCProFile_output"
+cache_folder = "E:/人工调色/convertICCProFile_cache"
+input_folder = "E:/人工调色/convertICCProFile_input"
+output_folder = "E:/人工调色/convertICCProFile_output"
 
-icc_profile = "./sRGB_IEC61966-2-1_no_black_scaling.icc"
+icc_profile = r"C:\P_tools\resources\sRGB_IEC61966-2-1_no_black_scaling.icc"
+# icc_profile = r"C:\P_tools\resources\sRGB_v4_ICC_preference.icc"
 
-allowed_extensions = [".jpg", ".jpeg", ".png", ".heic"]
+allowed_extensions = [".bmp", ".jpg", ".jpeg", ".png", ".heic"]
 
 interval_seconds = 10
 
@@ -73,6 +74,14 @@ def check_input_folder(root_dir):
                 # 备份文件到 cache 文件夹
                 shutil.move(input_file_path, cache_file_path)
                 print(f"Moved file: {input_file_path} -> {cache_file_path}")
+            else:
+                # 移动其他格式的文件到 cache 文件夹
+                cache_file_path = input_file_path
+                cache_file_path = cache_file_path.replace(
+                        "convertICCProFile_input", "convertICCProFile_cache"
+                        )
+                shutil.move(input_file_path, cache_file_path)
+                print(f"Moved file: {input_file_path} -> {cache_file_path}")
 
 
 def convert_image_format(input_path, output_path):
@@ -88,12 +97,11 @@ def convert_image_format(input_path, output_path):
             "magick",
             "convert",
             input_path,
-            "-strip",
             "-profile",
             icc_profile,
             output_path,
         ]
-        command = ['magick', 'convert', input_path, '-strip', '-profile', icc_profile, output_path]
+        command = ['magick', 'convert', input_path, '-profile', icc_profile, output_path]
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print(f"Converted image: {input_path} -> {output_path}")
         print(result)
